@@ -1,0 +1,178 @@
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rethinking @Input and @Output in Angular | Rupesh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        background: '#09090b', // Zinc 950
+                        surface: '#18181b',    // Zinc 900
+                        border: '#27272a',     // Zinc 800
+                        muted: '#a1a1aa',      // Zinc 400
+                        primary: '#fafafa',    // Zinc 50
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #09090b;
+            color: #fafafa;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-zinc-800 selection:text-white">
+
+    <div class="max-w-3xl mx-auto px-6 py-12 md:py-20 space-y-12">
+        
+        <!-- Navigation -->
+        <nav class="flex justify-between items-center py-4 sticky top-0 bg-[#09090b]/90 backdrop-blur-sm z-50 -mx-6 px-6">
+            <a href="index.html" class="flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors group">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
+                Back to Home
+            </a>
+            <span class="text-sm font-semibold">Rupesh<span class="text-zinc-500">.</span></span>
+        </nav>
+
+        <!-- Article Header -->
+        <header class="space-y-6 pt-8 border-b border-border pb-8">
+            <div class="flex flex-wrap gap-3 items-center text-sm">
+                <span class="text-zinc-400">December 6, 2025</span>
+                <span class="w-1 h-1 rounded-full bg-zinc-700"></span>
+                <span class="px-2.5 py-0.5 rounded-full border border-zinc-800 bg-zinc-900 text-zinc-300 text-xs font-medium">Angular</span>
+                <span class="px-2.5 py-0.5 rounded-full border border-zinc-800 bg-zinc-900 text-zinc-300 text-xs font-medium">Learning</span>
+            </div>
+            <h1 class="text-3xl md:text-5xl font-bold tracking-tight leading-tight">
+                Rethinking @Input and @Output in Angular
+            </h1>
+            <p class="text-xl text-muted leading-relaxed">
+                I wasted weeks confused by component communication until one simple mindset shift changed everything.
+            </p>
+            <div class="flex items-center gap-3 pt-2">
+                <div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-bold border border-border">R</div>
+                <div class="text-sm">
+                    <p class="font-medium text-primary">Rupesh</p>
+                    <p class="text-zinc-500">Frontend Developer</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Article Content -->
+        <article class="prose prose-invert prose-zinc max-w-none space-y-8 text-zinc-300 leading-7">
+            
+            <p>
+                I wasted weeks learning <code>@Input</code> and <code>@Output</code> in Angular. I was stuck in this rigid mindset: if you want to send data from parent to child → use <code>@Input</code>, and then child back to parent → use <code>@Output</code>.
+            </p>
+            
+            <p>
+                I kept repeating that rule in my head, but it never really clicked how to use it in real projects. Things only changed when I started thinking in a completely different way.
+            </p>
+
+            <h2 class="text-2xl font-bold text-primary mt-12 mb-4">The "Empty Component" Mindset</h2>
+            
+            <p>
+                Instead of abstractly thinking "I need @Input/@Output," I started thinking in terms of <strong>empty components</strong>.
+            </p>
+            
+            <p>
+                Imagine you have a button that you want to use in multiple components, in multiple places. The button design is the same everywhere, but the text (label) will change depending on where you use it. So what do we do?
+            </p>
+
+            <div class="bg-surface border border-border rounded-lg p-6 my-8">
+                <p class="mb-4 font-medium text-white">The Strategy:</p>
+                <ol class="list-decimal list-inside space-y-2 text-zinc-400 marker:text-zinc-600">
+                    <li>Create a button component that is basically <strong>empty</strong>.</li>
+                    <li>Keep the structure and styling <em>inside</em> the button component.</li>
+                    <li>Send the specific content/label from the <em>parent</em> wherever we use it.</li>
+                </ol>
+            </div>
+
+            <p>
+                That’s where <code>@Input</code> actually makes sense. In the child (button) component, we create a property that will act as a placeholder to receive data from the parent.
+            </p>
+
+            <div class="bg-surface border border-border rounded-lg p-6 my-8 overflow-x-auto">
+                <div class="flex items-center gap-2 mb-4 text-zinc-500 text-xs font-mono border-b border-zinc-800 pb-2">
+                    <span class="text-red-400">button.component.ts</span>
+                    <span>(Child)</span>
+                </div>
+                <pre class="font-mono text-sm"><code><span class="text-purple-400">@Input</span>() <span class="text-blue-400">dataFromParent</span> = <span class="text-green-300">''</span>;</code></pre>
+            </div>
+
+            <p>
+                Now <code>dataFromParent</code> is empty by default, and it lives in the child. Whenever we use this button, we bind any data from the parent to it:
+            </p>
+
+            <div class="bg-surface border border-border rounded-lg p-6 my-8 overflow-x-auto">
+                <div class="flex items-center gap-2 mb-4 text-zinc-500 text-xs font-mono border-b border-zinc-800 pb-2">
+                    <span class="text-blue-400">app.component.html</span>
+                    <span>(Parent)</span>
+                </div>
+                <pre class="font-mono text-sm"><code><span class="text-zinc-500">&lt;!-- Parent passing variable 'data' to child --&gt;</span>
+&lt;<span class="text-yellow-300">app-child</span> [<span class="text-blue-400">dataFromParent</span>]=<span class="text-green-300">"data"</span>&gt;&lt;/<span class="text-yellow-300">app-child</span>&gt;</code></pre>
+            </div>
+
+            <p>
+                Here, <code>data</code> is just a variable in the parent component. Whatever value it holds will show up inside the button.
+            </p>
+
+            <div class="border-l-4 border-green-500 bg-green-500/10 p-4 rounded-r-lg my-8">
+                <p class="text-green-200 text-sm">
+                    <strong>The Aha Moment:</strong> Once I started thinking like this—"make empty, reusable components and feed them data from the parent"—<code>@Input</code> finally started to feel natural.
+                </p>
+            </div>
+
+            <p>
+                I’m still not perfect with this stuff, but this mindset shift saved me a lot of frustration. If you're stuck memorizing the syntax, try focusing on the <em>flow</em> of data instead.
+            </p>
+
+        </article>
+
+        <!-- Footer / Next Post -->
+        <footer class="pt-12 border-t border-border mt-12">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-sm text-muted hover:text-white transition-colors">
+                    &larr; Previous Post
+                </a>
+                <a href="#" class="text-sm text-muted hover:text-white transition-colors">
+                    Next Post &rarr;
+                </a>
+            </div>
+            <div class="text-center mt-12 text-sm text-zinc-600">
+                &copy; 2025 Rupesh. All rights reserved.
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>
